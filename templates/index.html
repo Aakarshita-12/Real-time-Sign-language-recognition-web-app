@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Language Recognition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
+      color: #f1f1f1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      animation: backgroundFade 15s infinite alternate;
+    }
+
+    @keyframes backgroundFade {
+      0% { background-position: left; }
+      100% { background-position: right; }
+    }
+
+    h1 {
+      color: #58c5f1;
+      font-size: 3rem;
+      margin-bottom: 30px;
+      text-align: center;
+      animation: fadeIn 1.5s ease;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .video-container {
+      position: relative;
+      width: 480px;
+      height: 360px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+      margin-bottom: 20px;
+      background-color: #1b2a3a;
+      animation: slideUp 1.5s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      margin: 12px;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    }
+
+    .btn:hover {
+      background: linear-gradient(45deg, #3cd3ad, #4cb8c4);
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+    }
+
+    #prediction {
+      font-size: 1.5rem;
+      margin-top: 20px;
+      padding: 18px;
+      background: #263647;
+      border-radius: 12px;
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
+      animation: fadeIn 1s ease-in-out;
+      text-align: center;
+    }
+
+    .spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #58c5f1;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .history {
+      margin-top: 30px;
+      width: 100%;
+      max-width: 520px;
+      background-color: #1b2a3a;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+
+    .history h3 {
+      color: #cccccc;
+      font-size: 1.4rem;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #4dabf7;
+      padding-bottom: 6px;
+    }
+
+    .history ul {
+      list-style-type: none;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .history li {
+      padding: 10px;
+      background-color: #2f4f60;
+      border-left: 5px solid #00c6ff;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .history li:hover {
+      background-color: #3b5f77;
+      transform: scale(1.02);
+    }
+
+    .clear-btn {
+      display: block;
+      margin: 10px auto 0;
+      background: #ff4b5c;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .clear-btn:hover {
+      background: #ff3a4a;
+      transform: scale(1.05);
+    }
+
+    footer {
+      margin-top: 50px;
+      color: #cccccc;
+      font-size: 0.9rem;
+      text-align: center;
+      animation: fadeIn 2s ease;
+    }
+
+    @media (max-width: 600px) {
+      .video-container {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 3;
+      }
+      .btn {
+        width: 90%;
+        margin: 10px auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1><i class="fas fa-sign-language"></i> Sign Language Recognition</h1>
+
+  <div class="video-container">
+    <video id="webcam" autoplay playsinline></video>
+  </div>
+
+  <div>
+    <button class="btn" onclick="startWebcam()"><i class="fas fa-play"></i> Start Webcam</button>
+    <button class="btn" onclick="predictGesture()"><i class="fas fa-eye"></i> Predict</button>
+  </div>
+
+  <div id="prediction">Waiting for prediction...</div>
+
+  <div class="history">
+    <h3><i class="fas fa-history"></i> Prediction History</h3>
+    <ul id="historyList"></ul>
+    <button class="clear-btn" onclick="clearHistory()"><i class="fas fa-trash"></i> Clear History</button>
+  </div>
+
+  <footer>
+    Made <i class="fas fa-heart"></i> by Samridhi Gupta
+  </footer>
+
+  <script>
+    let video = document.getElementById("webcam");
+    let historyList = document.getElementById("historyList");
+    let predictionDiv = document.getElementById("prediction");
+
+    function startWebcam() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          video.srcObject = stream;
+        })
+        .catch(err => {
+          console.error("Error accessing webcam:", err);
+        });
+    }
+
+    function predictGesture() {
+      predictionDiv.innerHTML = `Predicting <span class="spinner"></span>`;
+
+      fetch('/predict', {
+        method: 'POST'
+      })
+        .then(res => res.json())
+        .then(data => {
+          predictionDiv.innerHTML = `Prediction: ${data.prediction}`;
+          let li = document.createElement("li");
+          li.innerText = data.prediction;
+          historyList.prepend(li);
+        })
+        .catch(err => {
+          console.error("Prediction error:", err);
+          predictionDiv.innerHTML = "Prediction failed. Try again.";
+        });
+    }
+
+    function clearHistory() {
+      historyList.innerHTML = "";
+    }
+  </script>
+</body>
+
+</html>
