@@ -87,14 +87,11 @@ python app.py
 
 ## 👩‍💻 Contributor
 
-**Samridhi Gupta**
+**Aakarshita Shukla**
 
 * 🖥️ Frontend UI & UX design
 * 🧠 Flask backend & integration
 * 🔄 ML model creation & deployment pipeline
-
-📩 Contact: [guptasamridhi1432@gmail.com](mailto:guptasamridhi1432@gmail.com)
-🧬 LinkedIn: [https://www.linkedin.com/in/samridhi-gupta](https://www.linkedin.com/in/samridhi-gupta)
 
 ---
 
